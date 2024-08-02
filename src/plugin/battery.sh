@@ -117,10 +117,29 @@ print_battery_percentage() {
 battery_percentage=$(print_battery_percentage)
 charging_status=$(battery_status)
 
+DISCHARGING_ICONS=("󰂎" "󰁼" "󰁾" "󰂀" "󰁹")
+
+get_battery_discharging_icon() {
+    value=${battery_percentage%\%}
+
+    if [ "$value" -ge 100 ]; then
+        plugin_battery_icon=$(get_tmux_option "@theme_plugin_battery_discharging_100_icon" "${DISCHARGING_ICONS[4]} ")
+    elif [ "$value" -ge 70 ]; then
+        plugin_battery_icon=$(get_tmux_option "@theme_plugin_battery_discharging_70_icon" "${DISCHARGING_ICONS[3]} ")
+    elif [ "$value" -ge 50 ]; then
+        plugin_battery_icon=$(get_tmux_option "@theme_plugin_battery_discharging_50_icon" "${DISCHARGING_ICONS[2]} ")
+    elif [ "$value" -ge 30 ]; then
+        plugin_battery_icon=$(get_tmux_option "@theme_plugin_battery_discharging_30_icon" "${DISCHARGING_ICONS[1]} ")
+    else
+        plugin_battery_icon=$(get_tmux_option "@theme_plugin_battery_discharging_0_icon" "${DISCHARGING_ICONS[0]} ")
+    fi
+}
+
 if [ "$charging_status" ==  "charging" ] || [ "$charging_status" == "charged" ]; then
     plugin_battery_icon=$(get_tmux_option "@theme_plugin_battery_charging_icon" " ")
 else
-    plugin_battery_icon=$(get_tmux_option "@theme_plugin_battery_discharging_icon" "󰁹 ")
+    get_battery_discharging_icon  
+    # plugin_battery_icon=$(get_tmux_option "@theme_plugin_battery_discharging_icon" "󰁹 ")
 fi
 
 battery_number="${battery_percentage//%/}"
